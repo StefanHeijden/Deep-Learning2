@@ -22,7 +22,7 @@ public class FunctionExperiment extends GUIExperiment {
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
-    int epochs = 100; 
+    int epochs = 10; 
     // Parameter for the gradient descent optimization method.
     double learningRate = 0.01;
     
@@ -39,7 +39,7 @@ public class FunctionExperiment extends GUIExperiment {
          
         Model model = createModel ( inputs , outputs ) ;
         model. initialize (new Gaussian());
-        // Training : c r e a t e and conf igure SGD && t r a i n model
+        // Training : create and configure SGD && trainmodel
         Optimizer sgd = SGD.builder ()
             .model (model )
             .validator(new Regression() )
@@ -48,7 +48,7 @@ public class FunctionExperiment extends GUIExperiment {
             
         trainModel(sgd ,reader ,epochs ,0) ;
        
-        // read input and pr int some informat ion on the data
+        // read input and print some informat ion on the data
         System.out.println ("Reader info:\n" + reader.toString( ) ) ;
         reader.getValidationData(20).forEach(System.out::println);
     }
