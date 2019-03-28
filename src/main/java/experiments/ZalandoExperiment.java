@@ -24,13 +24,13 @@ import nl.tue.s2id90.dl.javafx.FXGUI;
 
 public class ZalandoExperiment extends GUIExperiment {
     // ( hyper ) parameters
-    int batchSize = 32;
+    int batchSize = 16;
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
     int epochs = 5; 
     // Parameter for the gradient descent optimization method.
-    double learningRate = 0.01;
+    double learningRate = 0.05;
     
     // normal parameters
     // the number of neurons of the new layer
