@@ -18,17 +18,24 @@ import nl.tue.s2id90.dl.experiment.GUIExperiment;
 import nl.tue.s2id90.dl.javafx.ShowCase;
 import nl.tue.s2id90.dl.NN.layer.Flatten;
 import nl.tue.s2id90.dl.NN.layer.OutputSoftmax;
+import nl.tue.s2id90.dl.NN.layer.Convolution2D;
+import nl.tue.s2id90.dl.NN.layer.PoolMax2D;
+import nl.tue.s2id90.dl.NN.activation.Identity;
+import nl.tue.s2id90.dl.NN.activation.RELU;
+import nl.tue.s2id90.dl.NN.layer.FullyConnected;
+import nl.tue.s2id90.dl.NN.layer.SimpleOutput;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
+import nl.tue.s2id90.dl.NN.loss.MSE;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 
 public class ZalandoExperiment extends GUIExperiment {
     // ( hyper ) parameters
-    int batchSize = 32;
+    int batchSize = 64;
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
-    int epochs = 5; 
+    int epochs = 10; 
     // Parameter for the gradient descent optimization method.
     double learningRate = 0.01;
     
@@ -39,13 +46,14 @@ public class ZalandoExperiment extends GUIExperiment {
     int inputs ;
     int outputs;
         
-    String[ ] labels = {"T'shirt/top" , "Trouser" , "Pullover" , "Dress" , "Coat" ,
-    "Sandal" , "Shirt" , "Sneaker" , "Bag" , "Ankle boot" } ;
-    
+    //String[ ] labels = {"T'shirt/top" , "Trouser" , "Pullover" , "Dress" , "Coat" ,
+    //"Sandal" , "Shirt" , "Sneaker" , "Bag" , "Ankle boot" } ;
+    String[ ] labels = {"Square", "Circle", "Triangle"} ;
     ShowCase showCase = new ShowCase ( i -> labels[i]) ;
     
     public void go( ) throws IOException {
-        reader = MNISTReader.fashion( batchSize ) ;
+        //reader = MNISTReader.fashion( batchSize ) ;
+        reader = MNISTReader.primitives( batchSize ) ;
         inputs = reader.getInputShape().getNeuronCount();
         outputs = reader.getOutputShape().getNeuronCount();
         
@@ -79,9 +87,13 @@ public class ZalandoExperiment extends GUIExperiment {
         TensorShape image = new TensorShape ( imageSize, imageSize, 1);
         Model model = new Model(new InputLayer("In", image , true ) ) ;
         // add flattenlayer after input layer
-        model.addLayer (new Flatten ( "Flatten " , image)) ;
-        // add output layer
-        model.addLayer (new OutputSoftmax ( "Out " , new TensorShape(image.getNeuronCount()) , outputs , new CrossEntropy( ))) ;
+        
+        model.addLayer (new Convolution2D ( "Convo" , image, 3, 9, new RELU())) ;
+        model.addLayer (new PoolMax2D ("Pool", new TensorShape(imageSize, imageSize, 9), 2));
+        model.addLayer (new Convolution2D ( "Convo" , new TensorShape(14,14,9), 3, 3, new RELU())) ;
+        
+        model.addLayer (new Flatten ("Flat", new TensorShape(14,14,3)));
+        model.addLayer(new OutputSoftmax("Out ", new TensorShape(588) , outputs , new CrossEntropy()) ) ;
         return model;
     }
     
