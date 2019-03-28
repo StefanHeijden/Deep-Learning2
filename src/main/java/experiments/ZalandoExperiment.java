@@ -31,13 +31,13 @@ import nl.tue.s2id90.dl.javafx.FXGUI;
 
 public class ZalandoExperiment extends GUIExperiment {
     // ( hyper ) parameters
-    int batchSize = 64;
+    int batchSize = 8;
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
-    int epochs = 10; 
+    int epochs = 5; 
     // Parameter for the gradient descent optimization method.
-    double learningRate = 0.01;
+    double learningRate = 0.03;
     
     // normal parameters
     // the number of neurons of the new layer
@@ -88,12 +88,24 @@ public class ZalandoExperiment extends GUIExperiment {
         Model model = new Model(new InputLayer("In", image , true ) ) ;
         // add flattenlayer after input layer
         
-        model.addLayer (new Convolution2D ( "Convo" , image, 3, 9, new RELU())) ;
-        model.addLayer (new PoolMax2D ("Pool", new TensorShape(imageSize, imageSize, 9), 2));
-        model.addLayer (new Convolution2D ( "Convo" , new TensorShape(14,14,9), 3, 3, new RELU())) ;
+        //model.addLayer (new Convolution2D ( "Convo" , image, 3, 20, new RELU())) ;
+        //model.addLayer (new PoolMax2D ("Pool", new TensorShape(imageSize, imageSize, 9), 2));
+        model.addLayer (new Convolution2D ( "Convo" , image, 3, 32, new RELU())) ;
+        image = new TensorShape ( imageSize, imageSize, 32);
+        model.addLayer (new PoolMax2D ("Pool", image, 2));
+        imageSize /=2;
+        image = new TensorShape ( imageSize, imageSize, 32);
         
-        model.addLayer (new Flatten ("Flat", new TensorShape(14,14,3)));
-        model.addLayer(new OutputSoftmax("Out ", new TensorShape(588) , outputs , new CrossEntropy()) ) ;
+        model.addLayer (new Convolution2D ( "Convo" , image, 3, 64, new RELU())) ;
+        image = new TensorShape ( imageSize, imageSize, 64);
+        model.addLayer (new PoolMax2D ("Pool", image, 2));
+        imageSize /=2;
+        image = new TensorShape ( imageSize, imageSize, 64);
+        
+        model.addLayer (new Flatten ("Flat", image));
+        model.addLayer(new FullyConnected ( "fc1" , new TensorShape(imageSize*imageSize*64) , 128 , new RELU( )) ) ;
+        model.addLayer(new FullyConnected ( "fc1" , new TensorShape(128) , 64 , new RELU( )) ) ;
+        model.addLayer(new OutputSoftmax("Out ", new TensorShape(64) , outputs , new CrossEntropy()) ) ;
         return model;
     }
     
