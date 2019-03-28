@@ -7,6 +7,7 @@ package experiments;
 
 import nl.tue.s2id90.dl.input.MNISTReader;
 import java.io.IOException ;
+import java.util.List;
 import nl.tue.s2id90.dl.input.InputReader;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.layer.InputLayer;
@@ -19,6 +20,7 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
 import nl.tue.s2id90.dl.NN.layer.Flatten;
 import nl.tue.s2id90.dl.NN.layer.OutputSoftmax;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
+import nl.tue.s2id90.dl.NN.tensor.TensorPair;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 
@@ -48,6 +50,15 @@ public class ZalandoExperiment extends GUIExperiment {
         reader = MNISTReader.fashion( batchSize ) ;
         inputs = reader.getInputShape().getNeuronCount();
         outputs = reader.getOutputShape().getNeuronCount();
+        
+        // Preproccessing
+        MeanSubtraction dt = new MeanSubtraction();
+        List <TensorPair> trainingData = reader.getTrainingData();
+        dt.fit(trainingData);
+        // Test!! Print trainingData
+        dt.transform(trainingData);
+        // Test!! Print trainingData, see whether there is a difference
+        dt.transform(reader.getValidationData());
         
         System.out.println ("Inputs: " + inputs ) ;
         System.out.println ("Outputs: " + outputs ) ;
