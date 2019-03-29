@@ -24,8 +24,7 @@ public class L2Decay implements UpdateFunction {
     
     @Override
     public void update(INDArray array, boolean isBias, double learningRate, int batchSize, INDArray gradient) {
-        double factor = -(learningRate/batchSize);
-        Nd4j.getBlasWrapper().level1().axpy( array.length(), factor, gradient, array );
+        f.update(array, isBias, learningRate, batchSize, gradient);
         if (!isBias) {
            array.subi(array.mul(decay)) ;
         }
