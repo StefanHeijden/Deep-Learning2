@@ -26,20 +26,19 @@ import nl.tue.s2id90.dl.NN.layer.FullyConnected;
 import nl.tue.s2id90.dl.NN.layer.SimpleOutput;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.loss.MSE;
-import nl.tue.s2id90.dl.NN.optimizer.update.L2Decay;
 import nl.tue.s2id90.dl.NN.optimizer.update.GradientDescent;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 
 public class ShapesExperiment extends GUIExperiment {
     // ( hyper ) parameters
-    int batchSize = 32;
+    int batchSize = 8;
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
     int epochs = 7; 
     // Parameter for the gradient descent optimization method.
-    double learningRate = 0.04;
+    double learningRate = 0.03;
     
     // normal parameters
     // the number of neurons of the new layer
@@ -72,7 +71,7 @@ public class ShapesExperiment extends GUIExperiment {
             .model (model )
             .learningRate( learningRate )
             .validator(new Classification())
-            .updateFunction(() -> new L2Decay(GradientDescent::new, 0.0001))
+            .updateFunction(() -> new L2Decay(GradientDescent::new, 0))
             .build(); 
         trainModel(sgd ,reader ,epochs ,0);
        
@@ -88,10 +87,7 @@ public class ShapesExperiment extends GUIExperiment {
     Model createModel(int inputs , int outputs ) {
         TensorShape image = new TensorShape ( imageSize, imageSize, 1);
         Model model = new Model(new InputLayer("In", image , true ) ) ;
-        // add flattenlayer after input layer
         
-        //model.addLayer (new Convolution2D ( "Convo" , image, 3, 20, new RELU())) ;
-        //model.addLayer (new PoolMax2D ("Pool", new TensorShape(imageSize, imageSize, 9), 2));
         model.addLayer (new Convolution2D ( "Convo" , image, 3, 32, new RELU())) ;
         image = new TensorShape ( imageSize, imageSize, 32);
         
