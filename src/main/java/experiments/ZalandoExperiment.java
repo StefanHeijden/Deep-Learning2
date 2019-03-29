@@ -26,6 +26,8 @@ import nl.tue.s2id90.dl.NN.layer.FullyConnected;
 import nl.tue.s2id90.dl.NN.layer.SimpleOutput;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.loss.MSE;
+import nl.tue.s2id90.dl.NN.optimizer.update.L2Decay;
+import nl.tue.s2id90.dl.NN.optimizer.update.GradientDescent;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 
@@ -70,7 +72,7 @@ public class ZalandoExperiment extends GUIExperiment {
             .model (model )
             .learningRate( learningRate )
             .validator(new Classification())
-            .learningRate( learningRate )
+            .updateFunction(() -> new L2Decay(GradientDescent::new, 0))
             .build(); 
         trainModel(sgd ,reader ,epochs ,0);
        
@@ -92,15 +94,20 @@ public class ZalandoExperiment extends GUIExperiment {
         //model.addLayer (new PoolMax2D ("Pool", new TensorShape(imageSize, imageSize, 9), 2));
         model.addLayer (new Convolution2D ( "Convo" , image, 3, 32, new RELU())) ;
         image = new TensorShape ( imageSize, imageSize, 32);
+        
         model.addLayer (new PoolMax2D ("Pool", image, 2));
         imageSize /=2;
         image = new TensorShape ( imageSize, imageSize, 32);
         
         model.addLayer (new Convolution2D ( "Convo" , image, 3, 64, new RELU())) ;
         image = new TensorShape ( imageSize, imageSize, 64);
+        
         model.addLayer (new PoolMax2D ("Pool", image, 2));
         imageSize /=2;
         image = new TensorShape ( imageSize, imageSize, 64);
+        
+        
+        
         
         model.addLayer (new Flatten ("Flat", image));
         model.addLayer(new FullyConnected ( "fc1" , new TensorShape(imageSize*imageSize*64) , 128 , new RELU( )) ) ;
