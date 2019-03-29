@@ -26,7 +26,7 @@ import nl.tue.s2id90.dl.javafx.FXGUI;
 
 public class ZalandoExperiment extends GUIExperiment {
     // ( hyper ) parameters
-    int batchSize = 16;
+    int batchSize = 64;
     // The parameter epochs is the number of epochs that a
     // training takes. In an epoch all the training samples are presented
     // once to the neural network.
@@ -52,12 +52,11 @@ public class ZalandoExperiment extends GUIExperiment {
         outputs = reader.getOutputShape().getNeuronCount();
         
         // Preproccessing
+        
         MeanSubtraction dt = new MeanSubtraction();
         List <TensorPair> trainingData = reader.getTrainingData();
         dt.fit(trainingData);
-        // Test!! Print trainingData
         dt.transform(trainingData);
-        // Test!! Print trainingData, see whether there is a difference
         dt.transform(reader.getValidationData());
         
         System.out.println ("Inputs: " + inputs ) ;
@@ -74,6 +73,7 @@ public class ZalandoExperiment extends GUIExperiment {
             .learningRate( learningRate )
             .validator(new Classification())
             .learningRate( learningRate )
+            .updateFunction(MyGradientDescentVariant :: new)
             .build(); 
         trainModel(sgd ,reader ,epochs ,0);
        
